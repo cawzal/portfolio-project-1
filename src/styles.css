@@ -1,0 +1,50 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+#grid-container {
+	display: inline-block;
+}
+
+#grid {
+	display: grid;
+	grid-template-columns: repeat(20, 25px);
+	grid-template-rows: repeat(20, 25px);
+	cursor: pointer;
+}
+
+#grid div {
+	background-color: #ccc;
+	border: 4px dashed #ddd;
+	transition: all;
+	transition-duration: 250ms;
+}
+
+#grid div.frontier {
+	background-color: orange;
+}
+
+#grid div.explored {
+	background-color: yellow;
+}
+
+#grid div.target {
+	background-color: teal;
+}
+
+#grid div.path {
+	background-color: lightblue;
+}
+
+#grid div.start {
+	background-color: blue;
+}
+
+#grid div.black {
+	background-color: black;
+}
