@@ -54,6 +54,72 @@ function run() {
 	}, 0);
 }
 
+function run2() {
+
+	function* Generator() {
+		const root = state.startNode;
+		const target = state.targetNode;
+		root.visited = true;
+		root.cost = 0;
+
+		function calculateEstimate(a, b) {
+			return Math.abs(a.row - b.row) + Math.abs(a.col - b.col);
+		}
+
+		let priorityQueue = new PriorityQueue(function minComparator(a, b) {
+			return (a.cost + a.estimate) < (b.cost + b.estimate);
+		});
+		priorityQueue.add(root);
+		while (!priorityQueue.empty()) {
+			let active = priorityQueue.remove();
+
+			if (active.row === target.row && active.col == target.col) {
+				let path = [];
+				let current = active;
+				while (current !== null) {
+					path.push(current);
+					current = current.parent;
+				}
+
+				for (let i = 1; i < path.length; i++) {
+					ui.addClassAtIndex(path[i].row, path[i].col, 'path');
+					yield 1;
+				}
+				return;
+			}
+			ui.addClassAtIndex(active.row, active.col, 'explored');
+			yield 1;
+
+			for (let i = 0; i < active.neighbours.length; i++) {
+				let child = active.neighbours[i];
+				if (!child.visited) {
+					child.visited = true;
+					child.parent = active;
+					child.cost = active.cost + 1;
+					child.estimate = calculateEstimate(child, target);
+
+					ui.addClassAtIndex(child.row, child.col, 'frontier');;
+					yield 1;
+					priorityQueue.add(child);
+				}
+			}
+		}
+	}
+
+	state.updateNodes();
+
+	const generator = Generator();
+	const id = setInterval(() => {
+		const { done } = generator.next();
+		if (done) {
+			clearInterval(id);
+		}
+	}, 0);
+}
+
+
+
+
 const state = {
 	numberOfRows: 20,
 	numberOfCols: 20,	
@@ -185,7 +251,7 @@ const runBtn = document.querySelector("#run");
 const resetBtn = document.querySelector("#reset");
 
 document.addEventListener('foo', (event) => {
-	run();
+	run2();
 });
 
 runBtn.addEventListener('click', (event) => {
